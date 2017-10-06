@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myapp" ng-controller="membercontroller">
+  <head>
+    <script type="text/javascript">	
+  
+  function readCookie(cookieName) {
+ 	 var re = new RegExp('[; ]'+cookieName+'=([^\\s;]*)');
+ 	 var sMatch = (' '+document.cookie).match(re);
+ 	 if (cookieName && sMatch) return unescape(sMatch[1]);
+ 	 return '';
+ 	}
+  
+  var mail=readCookie("Email");
+  if(mail==""){
+	  alert("Login First");
+	  path="/myproject/login.html"
+	  window.location.href = path;
+  }
+  </script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Area | Dashboard</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="http://cdn.ckeditor.com/4.6.1/standard/ckeditor.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+     <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+  <script>
+    zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "ee6b7db5b51705a13dc2339db3edaf6d"];
+  </script>
+    <style type="text/css">
+    .modal-title {
+    color:#000000;
+    background-color: #fff;
+    
+}
+#date {
+    color:#000000;
+    background-color: #fff;
+    font-size: 15px;}
+
+#billamt{
+color:#000000;
+    background-color: #fff;
+    font-size: 15px;}
+     
+
+     html,
+    body {
+      height: 100%;
+      width: 100%;
+    }
+    
+    #myChart {
+      height: 100%;
+      width: 100%;
+      min-height: 450px;
+    }
+    #myChart3 {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .zc-ref {
+      display: none;
+    
+  
+}    
+
+
+    </style>
+  <!--  <link href="/assets/css/jquery-ui.1.11.2.min.css" rel="stylesheet" />
+    
+  <script type="text/javascript" src="/assets/script/canvasjs.min.js"></script>-->
+
+  </head>
+
+  <body ng-init="onload()">
+
+    <nav class="navbar navbar" color="#03A9F4">
+      <div class="container">
+        <div class="navbar-header" color="#03A9F4">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" color ="#03A9F4" href="#">Expense Tracker</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav" color="#03A9F4">
+            <li class="active"><a href="#.html">Dashboard</a></li>
+            <li><a href="index.html">Home</a></li>
+         
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Welcome {{userdetail}}</a></li>
+            <li ng-model="logoutuser" ng-click="userlogout()" ><a href="/myproject/adminlogout">Logout</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <header id="header">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-10">
+            <h1><span class="glyphicon glyphicon-th" aria-hidden="true"></span> Dashboard <small>You are father of all groups</small></h1>
+          </div>
+
+      
+     <div class="col-md-1">
+         <div class="dropdown create">
+              <button class="btn btn-danger" type="button"  href="#" onClick="return confirm('Are you absolutely sure you want to delete?')" ng-click="remove_user(user, $event)" ><span class="glyphicon glyphicon-remove-sign" ></span> Delete Account </button>
+              </div>
+              </div>
+      </div>
+      </div>
+    </header>
+
+    <section id="main">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="list-group">
+              <a href="index.html" class="list-group-item active " color="#03A9F4">
+                <span class="glyphicon glyphicon-th" aria-hidden="true"></span> Dashboard
+              </a>
+             
+              <a href="PendingRequests.html" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Pending Requests</a>
+              <a href="ActiveGroups.html" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Active Groups</a>
+              <a href="ApproveUser.html" class="list-group-item"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Pending Users </a>
+
+            </div>
+
+          </div>
+
+          <div class="col-md-9">
+             
+              <div class="row">
+              <div class="col-md-6">
+              <div class="card">
+              
+              <div id='myChart'><a class="zc-ref" href="https://www.zingchart.com/">Charts by ZingChart</a></div>
+              <script>
+    var myConfig = {
+      "graphset": [{
+        "type": "bar",
+        "background-color": "white",
+        "title": {
+          "text": "Active Users per month",
+          "font-color": "#000000",
+          "backgroundColor": "none",
+          "font-size": "22px",
+          "alpha": 1,
+          "adjust-layout": true,
+        },
+        "plotarea": {
+          "margin": "dynamic"
+        },
+        "legend": {
+          "layout": "x3",
+          "overflow": "page",
+          "alpha": 0.05,
+          "shadow": false,
+          "align": "center",
+          "adjust-layout": true,
+          /*"marker": {
+            "type": "circle",
+            "border-color": "none",
+            "size": "10px"
+          },*/
+          "border-width": 0,
+          "maxItems": 3,
+          "toggle-action": "hide",
+          "pageOn": {
+            "backgroundColor": "#000",
+            "size": "10px",
+            "alpha": 0.65
+          },
+          "pageOff": {
+            "backgroundColor": "#7E7E7E",
+            "size": "10px",
+            "alpha": 0.65
+          },
+          "pageStatus": {
+            "color": "black"
+          }
+        },
+        "plot": {
+          "bars-space-left": 0.15,
+          "bars-space-right": 0.15,
+          "animation": {
+            "effect": "ANIMATION_SLIDE_BOTTOM",
+            "sequence": 0,
+            "speed": 800,
+            "delay": 800
+          }
+        },
+        "scale-y": {
+          "line-color": "#7E7E7E",
+          "item": {
+            "font-color": "#7e7e7e"
+          },
+          "values": "0:100:10",
+          "guide": {
+            "visible": true
+          },
+          "label": {
+           // "text": "$ Billions",
+            "font-family": "arial",
+            "bold": true,
+            "font-size": "14px",
+            "font-color": "#7E7E7E",
+          },
+        },
+        "scaleX": {
+          "values": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"
+          ],
+          "placement": "default",
+          "tick": {
+            "size": 58,
+            "placement": "cross"
+          },
+          "itemsOverlap": true,
+          "item": {
+            "offsetY": -55
+          }
+        },
+         "scaleX2": {
+          "values": ["2017"],
+          "placement": "default",
+          "tick": {
+            "size": 20,
+          },
+          "item": {
+            "offsetY": -15
+          }
+        },
+        "tooltip": {
+          "visible": false
+        },
+        "crosshair-x": {
+          "line-width": "100%",
+          "alpha": 0.18,
+          "plot-label": {
+            "header-text": "%group"
+          }
+        },
+        "series": [{
+          "values": bData,
+          "alpha": 0.95,
+          "borderRadiusTopLeft": 7,
+          "background-color": "#03A9F4",
+          "text": "Users",
+        },
+          ]
+      }]
+    };
+
+    zingchart.render({
+      id: 'myChart',
+      data: myConfig,
+      height: '100%',
+      width: '100%'
+    });
+  </script>  
+              
+              </div>
+              </div>
+              <div class="col-md-6">
+              <div class="card">
+              <div id='myChart1'><a class="zc-ref" href="https://www.zingchart.com/">Powered by ZingChart</a></div>
+  
+  </div>
+  </div>
+                </div>
+              
+              <br>
+              <br>
+              <div class="row">
+              <div class="col-md-6">
+              <div class="card">
+               <div id='myChart2'><a class="zc-ref" href="https://www.zingchart.com/">Powered by ZingChart</a></div>
+  <script>
+    var myConfig = {
+      type: 'ring',
+      title: {
+        text: "Total Transaction amount by <br>each group"},
+      plot: {
+        slice: 150, // set hole size in middle of chart
+        detached: false // turn off click on slices
+      },
+      tooltip: {
+        visible: false
+      },
+      legend: {
+        toggleAction: 'remove', // remove plot so it re-calculates percentage
+        verticalAlign: 'middle',
+        align: 'center',
+        layout: 'vertical',
+        borderWidth: 0,
+        marker: {
+          type: 'circle',
+          size: 10,
+          cursor: 'pointer',
+        },
+        item: {
+          fontSize: 15,
+          cursor: 'pointer',
+          offsetX: -5
+        }
+      },
+      series: [{
+        values: doughData,
+        backgroundColor: "#FE7A5D",
+        text: doughLabels
+      } ]
+    };
+
+    zingchart.render({
+      id: 'myChart2',
+      data: myConfig,
+      height: 500,
+      width: '100%'
+    });
+
+    var angle = 0;
+    setInterval(function() {
+      angle = angle + 1.5;
+      zingchart.exec('myChart2', 'modify', {
+        object: 'plot',
+        data: {
+          refAngle: angle % 360
+        }
+      })
+    }, 35);
+  </script>
+              </div>
+              </div>
+              
+              
+              <div class="col-md-6">
+              <div class="card">
+               <div id='myChart3'><a class="zc-ref" href="https://www.zingchart.com/">Charts by ZingChart</a></div>
+  <script>
+  
+   
+  </script>
+              </div>
+              </div>
+
+              </div>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer id="footer">
+      <p>Copyright NIT Agartala &copy; 2017</p>
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.1/js/materialize.min.js"></script>
+<!--<script type="text/javascript" src="angularjs-dropdown-multiselect.js"></script>-->
+
+  </body>
+</html>
+<script>
+        var ap =angular.module("myapp",[]);
+        ap.controller("membercontroller",function($scope,$http,$window){
+        	
+        	$scope.userlogout=function(){
+        		document.cookie = "Email= ;expires=0;path=/";
+                document.cookie = "Mode= ;expires= 0;path=/";
+        	}
+        	
+        	 $scope.onload=function(){
+        		 var pieData,pieLabels,barData,barLabel;
+        		 
+        		 $http({
+                     url : '/myproject/admingraph',
+                     method : "GET",
+                    
+                 }).success(function(data, status, headers, config) {
+                     pieData=data.transactionbyeach;
+                     
+                    	 pieLabels=data.totalgroup1byeach;
+                    	
+                     	 barData=data.total_userbyeach;
+                     		 barLabel=data.totalgroup3byeach;
+                    	 
+                  }).error(function(data, status, headers, config) {
+                  });  
+        		   $http({
+          	           url : '/myproject/activegroup',
+          	           method : "GET",
+          	          
+          	       }).success(function(data, status, headers, config) {
+          	    	   
+          	    	  
+          	    	  $scope.userdetail=data.userdetail;
+          	    	  
+          	    	
+          	  	  
+          			}).error(function(data, status, headers, config) {
+          			}); 
+        		 
+        		 var originalConfig1 = {
+        			      "type": "ring",
+        			      "title": {
+        			        "text": "Number of transactions by each group"
+        			      },
+        			      "plot": {
+        			        "detach": false,
+        			        "cursor": "hande",
+        			        "shadow": 8,
+        			        "tooltip": {
+        			          "visible": false
+        			        },
+        			        "animation": {
+        			          "delay": 10,
+        			          "effect": "2",
+        			          "speed": "ANIMATION_FAST",
+        			          "method": "1",
+        			          "sequence": "3",
+        			          "attributes": {
+
+        			          }
+        			        },
+        			        "value-box": {
+        			          "color": "#FFF",
+        			          "text": "%t",
+        			          "font-weight": "none",
+        			          "font-size": 14
+        			        }
+        			      },
+        			      "series": [{
+        			        "values": pieData,
+        			        "background-color": "#F44336",
+        			        "text": pieLabels,
+        			        "data-id": "vt"
+        			      }]
+        			    }
+
+        			   
+        			    zingchart.render({
+        			            id: 'myChart1',
+        			            data: originalConfig1,
+        			            height: 450,
+        			            width: '100%'
+        			          });
+        		 
+        		 
+        		  zingchart.THEME = "classic";
+        		   ["#1976d2", "#424242", "#388e3c", "#ffa000", "#7b1fa2", "#c2185b"]; // ie, chrome, ff, safari, opera, unknown
+        		    var myConfig = {
+        		      "globals": {
+        		        "font-family": "Helvetica"
+        		      },
+        		      "type": "bar",
+        		      "background-color": "white",
+        		      "title": {
+        		        "color": "#606060",
+        		        "background-color": "white",
+        		        "text": "Number of users in each group",
+        		        "font-size": 20
+        		      },
+        		      
+        		      "scale-y": {
+        		        "line-color": "none",
+        		        "tick": {
+        		          "line-color": "none"
+        		        },
+        		        "guide": {
+        		          "line-style": "solid"
+        		        },
+        		        "item": {
+        		          "color": "#606060"
+        		        }
+        		      },
+        		      "scale-x": {
+        		        "values": barLabel,
+        		        "line-color": "#C0D0E0",
+        		        "line-width": 1,
+        		        "tick": {
+        		          "line-width": 1,
+        		          "line-color": "#C0D0E0"
+        		        },
+        		        "guide": {
+        		          "visible": false
+        		        },
+        		        "item": {
+        		          "color": "#606060"
+        		        }
+        		      },
+        		      "crosshair-x": {
+        		        "marker": {
+        		          "visible": false
+        		        },
+        		        "line-color": "none",
+        		        "line-width": "0px",
+        		        "scale-label": {
+        		          "visible": false
+        		        },
+        		        "plot-label": {
+        		          "text": "%data-browser: %v% of total",
+        		          "multiple": true,
+        		          "font-size": "12px",
+        		          "color": "#606060",
+        		          "background-color": "white",
+        		          "border-width": 3,
+        		          "alpha": 0.9,
+        		          "callout": true,
+        		          "callout-position": "bottom",
+        		          "shadow": 0,
+        		          "placement": "node-top",
+        		          "border-radius": 4,
+        		          "offsetY": -20,
+        		          "padding": 8,
+        		          "rules": [{
+        		            "rule": "%i==0",
+        		            "border-color": "#1976d2"
+        		          }, {
+        		            "rule": "%i==1",
+        		            "border-color": "#424242"
+        		          }, {
+        		            "rule": "%i==2",
+        		            "border-color": "#388e3c"
+        		          }, {
+        		            "rule": "%i==3",
+        		            "border-color": "#ffa000"
+        		          }, {
+        		            "rule": "%i==4",
+        		            "border-color": "#7b1fa2"
+        		          }, {
+        		            "rule": "%i==5",
+        		            "border-color": "#c2185b"
+        		          }]
+        		        }
+        		      },
+        		      "plot": {
+        		        "user-data": [
+        		          "<span style='font-weight:bold;color:#1976d2;'>Group_A</span>",
+        		          "<span style='font-weight:bold;color:#424242;'>Group_B</span>",
+        		          "<span style='font-weight:bold;color:#388e3c;'>Group_C</span>",
+        		          "<span style='font-weight:bold;color:#ffa000;'>Group_D</span>",
+        		          "<span style='font-weight:bold;color:#7b1fa2;'>Group_E</span>",
+        		        //  "<span style='font-weight:bold;color:#c2185b;'>Unknown</span>"
+        		        ],
+        		        "cursor": "hand",
+        		        "value-box": {
+        		          "text": "%v%",
+        		          "text-decoration": "underline",
+        		          "color": "#606060"
+        		        },
+        		        "tooltip": {
+        		          "visible": false
+        		        },
+        		        "animation": {
+        		          "effect": "7"
+        		        },
+        		        "rules": [{
+        		          "rule": "%i==0",
+        		          "background-color": "#1976d2"
+        		        }, {
+        		          "rule": "%i==1",
+        		          "background-color": "#FEDA60"
+        		        }, {
+        		          "rule": "%i==2",
+        		          "background-color": "#388e3c"
+        		        }, {
+        		          "rule": "%i==3",
+        		          "background-color": "#F44336"
+        		        }, {
+        		          "rule": "%i==4",
+        		          "background-color": "#7b1fa2"
+        		        }, {
+        		          "rule": "%i==5",
+        		          "background-color": "#c2185b"
+        		        }]
+        		      },
+        		      "series": [{
+        		        "values":barData
+        		      }]
+        		    };
+
+        		   
+        		    zingchart.render({
+        		      id: 'myChart3',
+        		      data: myConfig,
+        		      height: '500',
+        		      width: '100%'
+        		    });
+
+        		 
+        		 
+        		 
+        		 
+        		 
+        	 }
+        	
+        	
+     
+         $scope.names = ["Licky", "Deo", "Shashank","Piyush","Varshant","Jatin"];
+         $scope.groupname = ["Licky", "Deo", "Shashank","Piyush","Varshant","Jatin"];
+         $scope.Payable = ["Lic", "o", "Sank","Piyush","Varshant","Jatin"];
+         $scope.Recievable = ["Licky", "Deo", "Shashank","Psh","Vshant","Jin"];
+         $scope.dropnames = [{'id':'deo'},{'id':'sha'},{'id':'maa'}];
+         $scope.userdetail='shashank';
+  
+    $scope.selectAll = function (selected) {
+    var documents = $scope.documents;
+    angular.forEach(documents, function (doc) {
+        if(doc.selected)
+           $scope.selectedCounter +=1;
+       return selectedCounter;
+    });
+
+};
+
+
+    
+      $scope.myFunction = function() {
+      
+    
+      $window.alert('total count');
+            
+};
+    
+        });
+         
+ap.directive('ngConfirmClick', [
+    function(){
+        return {
+            link: function (scope, element, attr) {
+                var msg = attr.ngConfirmClick || "Are you sure?";
+                var clickAction = attr.confirmedClick;
+                element.bind('click',function (event) {
+                    if ( window.confirm(msg) ) {
+                        scope.$eval(clickAction)
+                    }
+                });
+            }
+        };
+}])
+
+        
+    </script>
